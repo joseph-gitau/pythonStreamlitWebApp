@@ -52,7 +52,6 @@ if 'fetch' not in st.session_state:
     st.session_state['fetch'] = False
 if 'fetch' in st.session_state == True:
     st.write('Fetching data...')
-    st.write('Fetching data...dfl;hdfldjl;fjwd[fksvgosfnhp0sdkf[sdk[frjgf')
 else :
     st.session_state['fetch'] = True
     url = "https://alpha-vantage.p.rapidapi.com/query"
@@ -62,7 +61,15 @@ else :
         st.session_state = {'response': requests.request("GET", url, headers=headers, params=querystring)}
         st.session_state ['stock_datatype'] = stock_datatype
     response = requests.request("GET", url, headers=headers, params=querystring)
-
+    if response.status_code == 200:
+        st.write('Data fetched successfully')
+        st.session_state['response'] = response
+        st.session_state ['stock_datatype'] = stock_datatype
+        # save the data as csv file
+        with open('data1.csv', 'w') as f:
+            writer = csv.writer(f)
+            for row in response.iter_lines():
+                writer.writerow(row.decode('utf-8').split(','))
     # display the data fetched from the API as either csv or json
     st.header('Fetched Data from API')
     # check if the data is in csv format and make it not closeable
@@ -75,23 +82,14 @@ else :
         # slider to ask and show how many results to show
         # calculate the number of rows of response results
         df = pd.read_csv(io.StringIO(st.session_state['response'].text))
+        lendf = len(df)
         st.write('Row count is:', len(df))
 
-        number = st.slider('Number of Results shown', min_value=1, max_value=100, value=10, step=1, key="slider")
+        number = st.slider('Number of Results shown', min_value=1, max_value=lendf, value=10, step=10, key="slider")
         # get slider value
         # st.session_state['slider_value'] = st.session_state['slider_value']
         # print slider value
         st.write("Slider Value:", number)
-        # st.write(response.text[:number])
-        # show all the data on checkbox click
-        # agree = st.checkbox('I agree')
-        # if 'agree' in st.session_state:
-        #     if st.session_state['agree']:
-        #         st.write(response.text)
-        #     else:
-        #         st.write(response.text[:100])
-        # if agree:
-        #     st.write('Great!')
         if st.checkbox('Show all data'):
             raw_data1 = pd.read_csv(io.StringIO(response.text))
             st.write(raw_data1)
@@ -104,7 +102,7 @@ else :
 
         # ask user how to display the data as interactive table, chart, line graph, area chart, bar chart, pie chart
         # st selectbox for stock display
-        stock_display = st.selectbox('Select Stock Display format', ('Interactive Table', 'Chart', 'Line Graph', 'Area Chart', 'Bar Chart', 'Pie Chart'))
+        stock_display = st.selectbox('Select Stock Display format', ('Interactive Table', 'Chart', 'Line Graph', 'Area Chart', 'Bar Chart', 'Map'))
         # if stock_display == 'Interactive Table':
         if stock_display == 'Interactive Table':
             # read the csv file
@@ -113,75 +111,44 @@ else :
             st.write(df)
         # elif stock_display == 'Chart':
         elif stock_display == 'Chart':
-            # read the csv file
-            df = pd.read_csv('data.csv')
-            # display the data as chart
-            st.line_chart(df)
+            # read the csv file data and put into array
+            dfa = pd.read_csv('data1.csv')
+            #select the columns to display
+            # st.write(dfa[['timestamp', 'open', 'high', 'low', 'close']])
+            dfc = dfa[['open', 'high', 'low', 'close']]
+            st.line_chart(dfc)
+
         # elif stock_display == 'Line Graph':
         elif stock_display == 'Line Graph':
             # read the csv file
-            df = pd.read_csv('data.csv')
-            # display the data as line graph
-            st.line_chart(df)
+            dfa = pd.read_csv('data1.csv')
+            # select the columns to display
+            # st.write(dfa[['timestamp', 'open', 'high', 'low', 'close']])
+            dfc = dfa[['open', 'high', 'low', 'close']]
+            st.line_chart(dfc)
         # elif stock_display == 'Area Chart':
         elif stock_display == 'Area Chart':
-            # read the csv file
-            df = pd.read_csv('data.csv')
-            # display the data as area chart
-            st.area_chart(df)
+            dfa = pd.read_csv('data1.csv')
+            # st.write(dfa[['timestamp', 'open', 'high', 'low', 'close']])
+            dfc = dfa[['open', 'high', 'low', 'close']]
+            st.area_chart(dfc)
         # elif stock_display == 'Bar Chart':
         elif stock_display == 'Bar Chart':
-            # read the csv file
-            df = pd.read_csv('data.csv')
-            # display the data as bar chart
-            st.bar_chart(df)
+            dfa = pd.read_csv('data1.csv')
+            # st.write(dfa[['timestamp', 'open', 'high', 'low', 'close']])
+            dfc = dfa[['open', 'high', 'low', 'close']]
+            st.bar_chart(dfc)
         # elif stock_display == 'Pie Chart':
-        elif stock_display == 'Pie Chart':
-            # read the csv file
-            df = pd.read_csv('data.csv')
-            # display the data as pie chart
-            st.write(df)
-            st.write(df.columns)
-            st.write(df['1. open'])
-            st.write(df['2. high'])
-            st.write(df['3. low'])
-            st.write(df['4. close'])
-            st.write(df['5. volume'])
-            st.write(df['6. market cap'])
-            st.write(df['7. dividend amount'])
-            st.write(df['8. split coefficient'])
-            st.write(df['9. dividend date'])
-            st.write(df['10. split date'])
-            st.write(df['11. previous close'])
-            st.write(df['12. change'])
-            st.write(df['13. change percent'])
-            st.write(df['14. last trade date'])
-            st.write(df['15. last trade time'])
-            st.write(df['16. last trade size'])
-            st.write(df['17. last trade price'])
-            st.write(df['18. last trade time zone'])
-            st.write(df['19. last trade day'])
-            st.write(df['20. last trade day close'])
-            st.write(df['21. last trade day change'])
-            st.write(df['22. last trade day change percent'])
-            st.write(df['23. last trade day high'])
-            st.write(df['24. last trade day low'])
-            st.write(df['25. last trade day volume'])
-            st.write(df['26. last trade day open'])
-            st.write(df['27. last trade day market cap'])
-            st.write(df['28. last trade day dividend amount'])
-            st.write(df['29. last trade day split coefficient'])
-            st.write(df['30. last trade day dividend date'])
-            st.write(df['31. last trade day split date'])
-            st.write(df['32. last trade day previous close'])
-            st.write(df['33. last trade day change'])
-            st.write(df['34. last trade day change percent'])
-            st.write(df['35. last trade day high'])
-            st.write(df['36. last trade day low'])
-            st.write(df['37. last trade day volume'])
-            st.write(df['38. last trade day open'])
-            st.write(df['39. last trade day market cap'])
-            st.write(df['40. last trade day dividend amount'])
+        elif stock_display == 'Map':
+            # dfa = pd.read_csv('data1.csv')
+            # # st.write(dfa[['timestamp', 'open', 'high', 'low', 'close']])
+            # dfc = dfa[['open', 'high', 'low', 'close']]
+            # st.map(dfc)
+            df = pd.DataFrame(
+                np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
+                columns=['lat', 'lon'])
+
+            st.map(df)
     else:
         # limit the data to 500 characters
         st.write(response.text[:500])
