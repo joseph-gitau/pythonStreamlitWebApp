@@ -6,31 +6,17 @@ import csv
 import requests
 import io
 
-# url = "https://alpha-vantage.p.rapidapi.com/query"
-#
-# querystring = {"interval": "5min", "function": "TIME_SERIES_INTRADAY", "symbol": "MSFT", "datatype": "csv",
-#                "output_size": "compact"}
-#
-# headers = {
-#     "X-RapidAPI-Key": "5d8f88f3dfmsh8f8745701f427c2p166500jsnb0867550681d",
-#     "X-RapidAPI-Host": "alpha-vantage.p.rapidapi.com"
-# }
-#
-# response = requests.request("GET", url, headers=headers, params=querystring)
-# # save the data as csv file
-# with open('data.csv', 'w') as f:
-#     writer = csv.writer(f)
-#     for row in response.iter_lines():
-#         writer.writerow(row.decode('utf-8').split(','))
-# # read the csv file
+e = RuntimeError('Something went wrong with the data fetching')
+st.exception(e)
 
 "st.session_state object:", st.session_state
 
 st.title("Alpha Vantage API")
-st.markdown("This app retrieves stock data for the last 7 days!")
+st.markdown("This app retrieves stock data for different companies!")
 
 # create main streamlit section
 st.header('Main Section')
+st.info('Filter the data to be shown using the following fields', icon="ℹ️")
 # st selectbox for stock ticker
 stock_ticker = st.selectbox('Select Stock Ticker', ('MSFT', 'AAPL', 'GOOG', 'AMZN', 'FB', 'TSLA', 'NFLX', 'NVDA', 'PYPL', 'ADBE'))
 # st selectbox for stock interval
@@ -62,7 +48,11 @@ else :
         st.session_state ['stock_datatype'] = stock_datatype
     response = requests.request("GET", url, headers=headers, params=querystring)
     if response.status_code == 200:
-        st.write('Data fetched successfully')
+        # st.write('Data fetched successfully')
+        st.success('Data fetched successfully!', icon="✅")
+        #success message disappears after 5 seconds
+        # st.balloons()
+
         st.session_state['response'] = response
         st.session_state ['stock_datatype'] = stock_datatype
         # save the data as csv file
@@ -70,6 +60,8 @@ else :
             writer = csv.writer(f)
             for row in response.iter_lines():
                 writer.writerow(row.decode('utf-8').split(','))
+    else:
+        st.error('Something went wrong please try again!', icon="🚨")
     # display the data fetched from the API as either csv or json
     st.header('Fetched Data from API')
     # check if the data is in csv format and make it not closeable
@@ -155,11 +147,6 @@ else :
         if (st.checkbox('Show full data')):
             stock_datatype = 'json'
             st.write(response.text)
-
-        #  drop down to ask user to plot the data as
-        # either line or bar chart
-
-
 
 
 # # create a section for the dataframe statistics

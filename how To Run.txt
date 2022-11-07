@@ -1,0 +1,8 @@
+1. Extraxt the zip and open the folder as a pycharm project. you can also open the folder as a python project in any other IDE.
+2. Install the requirements.txt file using pip install -r requirements.txt
+3. Run the app.py file using 'streamlit run app.py' command in the terminal.
+4. The app will be running on localhost:8501
+5. open the link in your browser and you are good to go.
+
+The app is deployed on streamlit and can be accessed using the link below:
+https://joseph-gitau-pythonstreamlitwebapp-app-7q3663.streamlit.app/
